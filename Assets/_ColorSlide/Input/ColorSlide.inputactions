@@ -1,0 +1,54 @@
+{
+    "name": "ColorSlide",
+    "maps": [
+        {
+            "name": "Pointer",
+            "id": "84d1360a-be1c-48a1-8c8a-4e0ec080ac50",
+            "actions": [
+                {
+                    "name": "Position",
+                    "type": "Value",
+                    "id": "1e6f8844-a776-4bf3-b7f1-5130f80b66a8",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Press",
+                    "type": "Button",
+                    "id": "39347990-eed3-4de3-b34b-4b0054184133",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "67cc806f-b641-4d06-bd8d-92333dc813c1",
+                    "path": "<Pointer>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Position",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "eb85276f-3ff6-42aa-931d-a33d20893373",
+                    "path": "<Pointer>/press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Press",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

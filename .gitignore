@@ -1,0 +1,41 @@
+# Unity generated data (retain Assets, Packages, ProjectSettings and all asset .meta files).
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Bb]uild/
+/[Bb]uilds/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+/*.apk
+/*.aab
+/*.unitypackage
+/*.zip
+
+# IDE and compiler output.
+/.vs/
+/.idea/
+/.vscode/
+/.gradle/
+/*.csproj
+/*.sln
+/*.slnx
+/*.suo
+/*.user
+/*.userprefs
+/*.pidb
+/*.booproj
+/*.opendb
+/*.VC.db
+/*.pdb
+/*.mdb
+/*.tmp
+/TestResults*.xml
+sysinfo.txt
+.DS_Store
+Thumbs.db
+
+# Unity Version Control's local workspace data.
+/.plastic/
+/.collabignore
