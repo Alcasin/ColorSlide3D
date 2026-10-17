@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ColorSlide.Board;
 using UnityEngine;
 
 namespace ColorSlide.Interaction
@@ -8,6 +9,7 @@ namespace ColorSlide.Interaction
     public sealed class GridBlockView : MonoBehaviour
     {
         [SerializeField] private string blockId;
+        [SerializeField] private BlockColor colorId;
         [SerializeField] private Vector2Int initialAnchor;
         [SerializeField] private Vector2Int[] footprint;
         [SerializeField] private Color color = Color.white;
@@ -15,13 +17,16 @@ namespace ColorSlide.Interaction
         private MaterialPropertyBlock highlight;
 
         public string BlockId => blockId;
+        public BlockColor ColorId => colorId;
         public Vector2Int InitialAnchor => initialAnchor;
         public IReadOnlyList<Vector2Int> Footprint => footprint;
         public IReadOnlyList<MeshRenderer> CellRenderers => cellRenderers;
 
-        public void Configure(string id, Vector2Int anchor, Vector2Int[] cells, Color tint, MeshRenderer[] renderers)
+        public void Configure(string id, Vector2Int anchor, Vector2Int[] cells, Color tint, MeshRenderer[] renderers,
+            BlockColor gameplayColor = BlockColor.None)
         {
             blockId = id;
+            colorId = gameplayColor;
             initialAnchor = anchor;
             footprint = (Vector2Int[])cells.Clone();
             color = tint;

@@ -47,7 +47,7 @@ namespace ColorSlide.Interaction
             {
                 if (view == null || !view.transform.IsChildOf(transform))
                     throw new InvalidOperationException("Every block view must belong to this board hierarchy.");
-                model.AddBlock(view.BlockId, view.InitialAnchor, view.Footprint);
+                model.AddBlock(view.BlockId, view.InitialAnchor, view.Footprint, view.ColorId);
             }
             return model;
         }
@@ -65,5 +65,19 @@ namespace ColorSlide.Interaction
         }
 
         public bool Owns(GridBlockView view) => Array.IndexOf(blockViews, view) >= 0;
+
+        // M2 retries replace the authoritative model without rebuilding or duplicating scene objects.
+        internal void AdoptModel(GridBoard model)
+        {
+            if (model == null || model.Width != width || model.Height != height ||
+                model.ActiveBlockCount != blockViews.Length || Array.Exists(blockViews, view => !model.IsActive(view.BlockId)))
+                throw new InvalidOperationException("The replacement model must match the authored board and block identities.");
+            Model = model;
+            foreach (var view in blockViews)
+            {
+                view.SnapTo(Coordinates.CellToWorld(model.GetBlock(view.BlockId).Anchor));
+                view.SetSelected(false);
+            }
+        }
     }
 }

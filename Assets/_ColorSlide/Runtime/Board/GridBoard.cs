@@ -11,16 +11,20 @@ namespace ColorSlide.Board
     public sealed class GridBlock
     {
         public string Id { get; }
+        public BlockColor ColorId { get; }
+        public bool IsRemoved { get; internal set; }
         public Vector2Int Anchor { get; internal set; }
         public ReadOnlyCollection<Vector2Int> Cells { get; }
         internal Vector2Int Extent { get; }
 
-        internal GridBlock(string id, Vector2Int anchor, IEnumerable<Vector2Int> footprint)
+        internal GridBlock(string id, Vector2Int anchor, IEnumerable<Vector2Int> footprint, BlockColor colorId)
         {
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentException("A block needs a stable nonempty identity.", nameof(id));
             if (footprint == null)
                 throw new ArgumentNullException(nameof(footprint));
+            if (!Enum.IsDefined(typeof(BlockColor), colorId))
+                throw new ArgumentException("Unknown block color identifier.", nameof(colorId));
 
             var cells = new List<Vector2Int>();
             var unique = new HashSet<Vector2Int>();
@@ -36,6 +40,7 @@ namespace ColorSlide.Board
                 throw new ArgumentException("A footprint must contain its anchor offset (0,0).", nameof(footprint));
 
             Id = id;
+            ColorId = colorId;
             Anchor = anchor;
             Cells = cells.AsReadOnly();
             Extent = extent;
@@ -43,7 +48,7 @@ namespace ColorSlide.Board
     }
 
     /// <summary>Scene-independent occupancy and cardinal movement. Grid Y maps to world Z.</summary>
-    public sealed class GridBoard
+    public sealed partial class GridBoard
     {
         private readonly Dictionary<string, GridBlock> blocks = new Dictionary<string, GridBlock>(StringComparer.Ordinal);
         private readonly Dictionary<Vector2Int, GridBlock> occupancy = new Dictionary<Vector2Int, GridBlock>();
@@ -71,9 +76,10 @@ namespace ColorSlide.Board
         public GridBlock OccupantAt(Vector2Int cell) => occupancy.TryGetValue(cell, out var block) ? block : null;
         public GridBlock GetBlock(string id) => blocks[id];
 
-        public GridBlock AddBlock(string id, Vector2Int anchor, IEnumerable<Vector2Int> footprint)
+        public GridBlock AddBlock(string id, Vector2Int anchor, IEnumerable<Vector2Int> footprint,
+            BlockColor colorId = BlockColor.None)
         {
-            var block = new GridBlock(id, anchor, footprint);
+            var block = new GridBlock(id, anchor, footprint, colorId);
             if (blocks.ContainsKey(id))
                 throw new ArgumentException("Duplicate block identity: " + id, nameof(id));
             if (!CanPlace(block, anchor))
