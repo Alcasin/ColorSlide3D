@@ -17,7 +17,17 @@ namespace ColorSlide.Gameplay
         // Same accepted M1 materials, in this order: Blue, Amber, Purple, Green, TileA, TileB, Obstacle.
         [SerializeField] private Material[] materials;
         [SerializeField] private SoftToyTheme theme;
+        [SerializeField] private bool softCubeBursts;
+        [SerializeField] private bool gameplayFeedback;
+        public bool GameplayFeedback => gameplayFeedback;
+        public void ConfigureGameplayFeedback(bool value)
+        {
+            if (value && (!softCubeBursts || theme == null)) throw new InvalidOperationException("Feedback requires the themed M4.5 burst presentation.");
+            gameplayFeedback = value;
+        }
         public SoftToyTheme Theme => theme;
+        public bool SoftCubeBursts => softCubeBursts;
+        public void ConfigureSoftCubeBursts(bool value) { if (value && theme == null) throw new InvalidOperationException("M4.5 requires an M4 theme."); softCubeBursts = value; }
         public void ConfigureTheme(SoftToyTheme value) { value.Validate(); theme = value; materials = value.Palette.ToArray(); }
         public Camera InteractionCamera => interactionCamera;
         public InputActionAsset PointerActions => pointerActions;
@@ -29,6 +39,8 @@ namespace ColorSlide.Gameplay
         public void ValidateResources()
         {
             if (theme != null) theme.Validate();
+            if (softCubeBursts && theme == null) throw new InvalidOperationException("M4.5 requires the accepted M4 theme.");
+            if (gameplayFeedback && !softCubeBursts) throw new InvalidOperationException("Feedback requires M4.5 bursts.");
             if (interactionCamera == null || pointerActions == null || materials == null || materials.Length != 7 ||
                 materials.Any(material => material == null) || transform.lossyScale != Vector3.one ||
                 Quaternion.Angle(transform.rotation, Quaternion.identity) > 0.01f)
@@ -124,8 +136,13 @@ namespace ColorSlide.Gameplay
                 gameplay.Configure(board, drag, gates.ToArray());
                 drag.ConfigureGameplay(gameplay);
                 gameplay.InitializeSession(session);
+                if (softCubeBursts)
+                {
+                    var burst = root.AddComponent<SoftCubeBurst>(); burst.Configure(theme, size); gameplay.ConfigureExitBurst(burst);
+                }
                 if (theme != null)
-                    foreach (var view in views) view.gameObject.AddComponent<PolishedBlockVisual>().Configure(view, gameplay, size);
+                    foreach (var view in views) view.gameObject.AddComponent<PolishedBlockVisual>().Configure(view, gameplay, size, gameplayFeedback);
+                if (gameplayFeedback) root.AddComponent<GateGlow>().Configure(gameplay);
                 return gameplay; // Caller retires the old hierarchy before activating this one.
             }
             catch { Retire(root); throw; }

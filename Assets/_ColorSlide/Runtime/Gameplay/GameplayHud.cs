@@ -54,7 +54,10 @@ namespace ColorSlide.Gameplay
         private void Restart() { if (campaign != null) campaign.Restart(); else if (gameplay != null) gameplay.Restart(); }
         private void Next() { if (campaign != null) campaign.Next(); }
 
-        private void LateUpdate()
+        private void LateUpdate() => Refresh();
+
+        // Deterministic presentation tick, also usable by EditMode tests without engine message dispatch.
+        public void Refresh()
         {
             var owner = Gameplay;
             if (!HasReferences || owner == null || owner.Session == null)
@@ -63,7 +66,7 @@ namespace ColorSlide.Gameplay
             var seconds = (int)Math.Min(int.MaxValue, Math.Ceiling(Math.Max(0d, session.RemainingSeconds)));
             timeText.text = (polishedLabels ? "" : "Time ") + seconds / 60 + ":" + (seconds % 60).ToString("00");
             countText.text = polishedLabels ? session.RemainingBlocks + " left" : "Blocks " + session.RemainingBlocks;
-            var terminal = session.State == GameplayState.Won || session.State == GameplayState.Failed;
+            var terminal = (session.State == GameplayState.Won || session.State == GameplayState.Failed) && !owner.IsShowingExitBurst;
             resultPanel.SetActive(terminal);
             if (terminal)
                 resultText.text = campaign != null && campaign.Campaign.IsComplete ? "Campaign Complete!" :

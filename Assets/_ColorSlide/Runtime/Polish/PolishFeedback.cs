@@ -51,7 +51,12 @@ namespace ColorSlide.Polish
         }
         private void ResetCues() { cues.Reset(); if (source != null) source.Stop(); }
         private void Selected(GridBlockView view) => Play(cues.BeginGesture());
-        private void Moved(GridBlockView view, MovementResult result) => Play(cues.Move(view.BlockId, result.Status));
+        private void Moved(GridBlockView view, MovementResult result)
+        {
+            var cue = cues.Move(view.BlockId, result.Status);
+            if (view.TryGetComponent<PolishedBlockVisual>(out var visual)) visual.ObserveMovement(result, cue == SoundCue.Blocked);
+            Play(cue);
+        }
         private void UiClick() => Play(SoundCue.UiClick);
         private void LateUpdate() { if (current != null && current.Session != null) Play(cues.Observe(current.Session.State)); }
         private void Play(SoundCue cue)

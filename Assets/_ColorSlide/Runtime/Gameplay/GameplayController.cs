@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ColorSlide.Board;
 using ColorSlide.Interaction;
+using ColorSlide.Polish;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -23,16 +24,22 @@ namespace ColorSlide.Gameplay
         private Vector3 exitStart;
         private Vector3 exitEnd;
         private float exitAge;
+        private SoftCubeBurst exitBurst;
+        private bool burstExit;
 
         public PuzzleSession Session { get; private set; }
         public InteractionBoard Board => board;
         public PointerDragController Drag => drag;
         public IReadOnlyList<ExitGateView> GateViews => gateViews;
-        public bool IsPresentingExit => exiting != null;
-        public float ExitProgress => exiting != null ? Mathf.Clamp01(exitAge / exitSeconds) : 0f;
+        public bool IsPresentingExit => exiting != null || burstExit;
+        public float ExitProgress => exiting != null ? Mathf.Clamp01(exitAge / (burstExit ? SoftBurstMotion.Duration : exitSeconds)) : 0f;
+        public bool UsesSoftCubeBurst => exitBurst != null && exitBurst.isActiveAndEnabled;
+        public bool IsShowingExitBurst => burstExit && IsPresentingExit;
+        public void ConfigureExitBurst(SoftCubeBurst value) => exitBurst = value;
         public event Action Restarted;
+        public event Action<ExitPlan> ExitStarted;
         public bool CanInteract => isActiveAndEnabled && Session != null &&
-            Session.State == GameplayState.Playing && exiting == null;
+            Session.State == GameplayState.Playing && !IsPresentingExit;
 
         public void Configure(InteractionBoard targetBoard, PointerDragController input, ExitGateView[] exits)
         {
@@ -90,7 +97,7 @@ namespace ColorSlide.Gameplay
             var result = Session.MoveTowards(view.BlockId, target, axis);
             if (result.Exit != null)
             {
-                // Occupancy is already released. Serialize interaction for these 0.3 seconds,
+                // Occupancy is already released. Serialize interaction until presentation completes,
                 // so another block cannot visually enter the departing shape's swept cells.
                 exiting = view;
                 exitStart = board.Coordinates.CellToWorld(result.Exit.StartAnchor);
@@ -100,6 +107,8 @@ namespace ColorSlide.Gameplay
                 view.SnapTo(exitStart);
                 foreach (var collider in view.GetComponentsInChildren<Collider>(true))
                     collider.enabled = false;
+                burstExit = UsesSoftCubeBurst && exitBurst.Begin(view, result.Exit, exitStart, exitEnd);
+                ExitStarted?.Invoke(result.Exit);
             }
             return result;
         }
@@ -111,9 +120,25 @@ namespace ColorSlide.Gameplay
             // Pointer input happens in Update. A final accepted exit wins over timeout in this frame.
             if (Session.Advance(Time.unscaledDeltaTime))
                 drag.CancelDrag();
+            AdvanceExitPresentation(Time.unscaledDeltaTime);
+        }
+
+        // One clock for old and optional presentations; also permits deterministic Editor lifecycle checks.
+        public void AdvanceExitPresentation(float elapsedSeconds)
+        {
+            if (float.IsNaN(elapsedSeconds) || float.IsInfinity(elapsedSeconds) || elapsedSeconds < 0f)
+                throw new ArgumentOutOfRangeException(nameof(elapsedSeconds));
             if (exiting == null)
+            {
+                if (burstExit) FinishExit(); // A destroyed view must not strand its owned fragments or completion gate.
                 return;
-            exitAge += Time.unscaledDeltaTime;
+            }
+            exitAge += elapsedSeconds;
+            if (burstExit)
+            {
+                if (exitBurst == null || !exitBurst.isActiveAndEnabled || exitBurst.Present(exitAge)) FinishExit();
+                return;
+            }
             exiting.SnapTo(Vector3.Lerp(exitStart, exitEnd, Mathf.Clamp01(exitAge / exitSeconds)));
             if (exitAge >= exitSeconds)
                 FinishExit();
@@ -121,6 +146,7 @@ namespace ColorSlide.Gameplay
 
         private void FinishExit()
         {
+            if (exitBurst != null) exitBurst.Cancel();
             if (exiting != null)
             {
                 exiting.SnapTo(exitEnd);
@@ -128,6 +154,7 @@ namespace ColorSlide.Gameplay
             }
             exiting = null;
             exitAge = 0f;
+            burstExit = false;
         }
 
         public void Restart()
@@ -136,8 +163,10 @@ namespace ColorSlide.Gameplay
                 return;
             Initialize();
             drag.CancelDrag();
+            if (exitBurst != null) exitBurst.Cancel();
             exiting = null;
             exitAge = 0f;
+            burstExit = false;
             Session.Restart();
             board.AdoptModel(Session.Board);
             foreach (var view in board.BlockViews)
