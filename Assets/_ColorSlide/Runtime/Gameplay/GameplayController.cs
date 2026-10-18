@@ -29,6 +29,8 @@ namespace ColorSlide.Gameplay
         public PointerDragController Drag => drag;
         public IReadOnlyList<ExitGateView> GateViews => gateViews;
         public bool IsPresentingExit => exiting != null;
+        public float ExitProgress => exiting != null ? Mathf.Clamp01(exitAge / exitSeconds) : 0f;
+        public event Action Restarted;
         public bool CanInteract => isActiveAndEnabled && Session != null &&
             Session.State == GameplayState.Playing && exiting == null;
 
@@ -143,6 +145,7 @@ namespace ColorSlide.Gameplay
             foreach (var pair in initialColliders)
                 if (pair.Key != null)
                     pair.Key.enabled = pair.Value;
+            Restarted?.Invoke();
         }
 
         public bool IsPointerOverUI(Vector2 position)

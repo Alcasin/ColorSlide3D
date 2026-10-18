@@ -16,6 +16,8 @@ namespace ColorSlide.Gameplay
         [SerializeField] private CampaignController campaign;
         [SerializeField] private Text levelText;
         [SerializeField] private Button next;
+        [SerializeField] private bool polishedLabels;
+        public void ConfigurePolishedLabels() => polishedLabels = true;
         public GameplayController Gameplay => campaign != null ? campaign.Gameplay : gameplay;
         public CampaignController Campaign => campaign;
         public bool HasCampaignReferences => campaign != null && levelText != null && next != null;
@@ -59,8 +61,8 @@ namespace ColorSlide.Gameplay
                 return;
             var session = owner.Session;
             var seconds = (int)Math.Min(int.MaxValue, Math.Ceiling(Math.Max(0d, session.RemainingSeconds)));
-            timeText.text = "Time " + seconds / 60 + ":" + (seconds % 60).ToString("00");
-            countText.text = "Blocks " + session.RemainingBlocks;
+            timeText.text = (polishedLabels ? "" : "Time ") + seconds / 60 + ":" + (seconds % 60).ToString("00");
+            countText.text = polishedLabels ? session.RemainingBlocks + " left" : "Blocks " + session.RemainingBlocks;
             var terminal = session.State == GameplayState.Won || session.State == GameplayState.Failed;
             resultPanel.SetActive(terminal);
             if (terminal)
@@ -68,7 +70,8 @@ namespace ColorSlide.Gameplay
                     session.State == GameplayState.Won ? "You Win!" : "Time's Up";
             if (HasCampaignReferences && campaign.Campaign != null)
             {
-                levelText.text = "Level " + (campaign.Campaign.CurrentIndex + 1) + " / " + campaign.Campaign.LevelCount + " - " + campaign.Campaign.CurrentLevel.DisplayName;
+                levelText.text = polishedLabels ? campaign.Campaign.CurrentLevel.DisplayName :
+                    "Level " + (campaign.Campaign.CurrentIndex + 1) + " / " + campaign.Campaign.LevelCount + " - " + campaign.Campaign.CurrentLevel.DisplayName;
                 next.gameObject.SetActive(campaign.Campaign.CanNext);
                 next.interactable = campaign.CanNext;
             }

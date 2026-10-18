@@ -15,6 +15,9 @@ namespace ColorSlide.Interaction
         [SerializeField] private Color color = Color.white;
         [SerializeField] private MeshRenderer[] cellRenderers;
         private MaterialPropertyBlock highlight;
+        private bool isSelected;
+        public bool IsSelected => isSelected;
+        public event Action<bool> SelectionChanged;
 
         public string BlockId => blockId;
         public BlockColor ColorId => colorId;
@@ -37,6 +40,8 @@ namespace ColorSlide.Interaction
         {
             if (cellRenderers == null)
                 return;
+            var changed = isSelected != selected;
+            isSelected = selected;
             if (highlight == null)
                 highlight = new MaterialPropertyBlock();
             foreach (var renderer in cellRenderers)
@@ -47,6 +52,7 @@ namespace ColorSlide.Interaction
                 highlight.SetColor("_BaseColor", selected ? Color.Lerp(color, Color.white, 0.4f) : color);
                 renderer.SetPropertyBlock(highlight);
             }
+            if (changed) SelectionChanged?.Invoke(selected);
         }
 
         public void SnapTo(Vector3 anchorPosition) => transform.position = anchorPosition;

@@ -5,6 +5,7 @@ using ColorSlide.Board;
 using ColorSlide.Interaction;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using ColorSlide.Polish;
 
 namespace ColorSlide.Gameplay
 {
@@ -15,6 +16,9 @@ namespace ColorSlide.Gameplay
         [SerializeField] private InputActionAsset pointerActions;
         // Same accepted M1 materials, in this order: Blue, Amber, Purple, Green, TileA, TileB, Obstacle.
         [SerializeField] private Material[] materials;
+        [SerializeField] private SoftToyTheme theme;
+        public SoftToyTheme Theme => theme;
+        public void ConfigureTheme(SoftToyTheme value) { value.Validate(); theme = value; materials = value.Palette.ToArray(); }
         public Camera InteractionCamera => interactionCamera;
         public InputActionAsset PointerActions => pointerActions;
         public IReadOnlyList<Material> Materials => materials;
@@ -24,6 +28,7 @@ namespace ColorSlide.Gameplay
 
         public void ValidateResources()
         {
+            if (theme != null) theme.Validate();
             if (interactionCamera == null || pointerActions == null || materials == null || materials.Length != 7 ||
                 materials.Any(material => material == null) || transform.lossyScale != Vector3.one ||
                 Quaternion.Angle(transform.rotation, Quaternion.identity) > 0.01f)
@@ -94,9 +99,22 @@ namespace ColorSlide.Gameplay
                     var material = ColorMaterial(block.ColorId);
                     foreach (var cell in block.Cells)
                         renderers.Add(Cube("Shape Cell " + cell, obj.transform, new Vector3(cell.x * size, size * 0.23f, cell.y * size),
-                            new Vector3(size * 0.94f, size * 0.46f, size * 0.94f), material, true));
+                            new Vector3(size * 0.94f, size * 0.46f, size * 0.94f), material, true, true));
                     var view = obj.AddComponent<GridBlockView>();
-                    view.Configure(block.Id, block.Anchor, block.Cells.ToArray(), material.GetColor("_BaseColor"), renderers.ToArray(), block.ColorId);
+                    view.Configure(block.Id, block.Anchor, block.Cells.ToArray(), theme != null ? SoftToyTheme.SelectionSrgb(material) :
+                        material.GetColor("_BaseColor"), renderers.ToArray(), block.ColorId);
+                    if (theme != null)
+                    foreach (var cell in block.Cells)
+                    {
+                        var shadow = new GameObject("Contact Shadow", typeof(MeshFilter), typeof(MeshRenderer));
+                        shadow.transform.SetParent(obj.transform, false);
+                        shadow.transform.localPosition = new Vector3(cell.x * size, -0.002f * size, cell.y * size);
+                        shadow.transform.localScale = Vector3.one * size;
+                        shadow.GetComponent<MeshFilter>().sharedMesh = theme.ContactShadow;
+                        var shadowRenderer = shadow.GetComponent<MeshRenderer>(); shadowRenderer.sharedMaterial = theme.Shadow;
+                        shadowRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                        shadowRenderer.receiveShadows = false;
+                    }
                     views.Add(view);
                 }
                 board.Configure(model.Width, model.Height, size, model.BlockedCells.ToArray(), views.ToArray());
@@ -106,6 +124,8 @@ namespace ColorSlide.Gameplay
                 gameplay.Configure(board, drag, gates.ToArray());
                 drag.ConfigureGameplay(gameplay);
                 gameplay.InitializeSession(session);
+                if (theme != null)
+                    foreach (var view in views) view.gameObject.AddComponent<PolishedBlockVisual>().Configure(view, gameplay, size);
                 return gameplay; // Caller retires the old hierarchy before activating this one.
             }
             catch { Retire(root); throw; }
@@ -130,7 +150,7 @@ namespace ColorSlide.Gameplay
                 default: return new Vector3(-size * 0.5f, size * 0.15f, index * size);
             }
         }
-        private static MeshRenderer Cube(string name, Transform parent, Vector3 position, Vector3 scale, Material material, bool collider)
+        private MeshRenderer Cube(string name, Transform parent, Vector3 position, Vector3 scale, Material material, bool collider, bool blockCell = false)
         {
             var obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
             obj.name = name; obj.transform.SetParent(parent, false); obj.transform.localPosition = position; obj.transform.localScale = scale;
@@ -139,7 +159,16 @@ namespace ColorSlide.Gameplay
                 var component = obj.GetComponent<Collider>(); component.enabled = false;
                 if (Application.isPlaying) Destroy(component); else DestroyImmediate(component);
             }
-            var renderer = obj.GetComponent<MeshRenderer>(); renderer.sharedMaterial = material; return renderer;
+            var renderer = obj.GetComponent<MeshRenderer>(); renderer.sharedMaterial = material;
+            if (theme == null) return renderer;
+            if (!blockCell) { obj.GetComponent<MeshFilter>().sharedMesh = theme.RoundedBox; return renderer; }
+            renderer.enabled = false; // Primitive transform and BoxCollider retain the accepted dimensions.
+            var visual = new GameObject("Soft Visual", typeof(MeshFilter), typeof(MeshRenderer));
+            visual.transform.SetParent(obj.transform, false);
+            if (blockCell) visual.transform.localScale = new Vector3(0.98f / 0.94f, 1f, 0.98f / 0.94f);
+            visual.GetComponent<MeshFilter>().sharedMesh = theme.RoundedBox;
+            var softRenderer = visual.GetComponent<MeshRenderer>(); softRenderer.sharedMaterial = material;
+            return softRenderer;
         }
     }
 }

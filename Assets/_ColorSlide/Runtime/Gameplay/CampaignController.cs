@@ -14,6 +14,7 @@ namespace ColorSlide.Gameplay
         public LevelPresentation Presentation => presentation;
         public CampaignSession Campaign { get; private set; }
         public GameplayController Gameplay { get; private set; }
+        public event Action<GameplayController> GameplayChanged;
         public bool CanNext => isActiveAndEnabled && Campaign != null && Campaign.CanNext && Gameplay != null && !Gameplay.IsPresentingExit;
         public void Configure(LevelDefinition[] definitions, LevelPresentation view)
         { levels = (LevelDefinition[])definitions.Clone(); presentation = view; }
@@ -48,6 +49,7 @@ namespace ColorSlide.Gameplay
             if (previous != null) LevelPresentation.Retire(previous.gameObject);
             Gameplay = replacement;
             replacement.gameObject.SetActive(true);
+            GameplayChanged?.Invoke(replacement);
         }
         public bool Next()
         {

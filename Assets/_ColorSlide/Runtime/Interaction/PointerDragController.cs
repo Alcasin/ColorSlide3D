@@ -26,6 +26,8 @@ namespace ColorSlide.Interaction
         public Camera InteractionCamera => interactionCamera;
         public InputActionAsset InputActions => inputActions;
         public GameplayController Gameplay => gameplay;
+        public event Action<GridBlockView> SelectionStarted;
+        public event Action<GridBlockView, MovementResult> MovementRequested;
         public void ConfigureGameplay(GameplayController session) => gameplay = session;
         public void CancelDrag() => EndDrag();
 
@@ -96,6 +98,7 @@ namespace ColorSlide.Interaction
             if (gameplay != null)
             {
                 var result = gameplay.RequestMove(selected, target, BoardCoordinates.DominantAxis(motion));
+                MovementRequested?.Invoke(selected, result);
                 if (result.Status == MovementStatus.Exited)
                 {
                     EndDrag();
@@ -133,6 +136,7 @@ namespace ColorSlide.Interaction
             previousPoint = point;
             grabOffset = point - board.Coordinates.CellToWorld(board.Model.GetBlock(view.BlockId).Anchor);
             view.SetSelected(true);
+            SelectionStarted?.Invoke(view);
         }
 
         private bool ProjectPointer(Vector2 position, out Vector3 point)

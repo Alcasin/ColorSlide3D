@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 478f9462f0a8482796cadb2368b15c2c, type: 3}
+  m_Name: SoftToyTheme
+  m_EditorClassIdentifier: ColorSlide.Runtime::ColorSlide.Polish.SoftToyTheme
+  roundedBox: {fileID: 4300000, guid: 29ba47b4590e30c488a84be2f5b12b6c, type: 2}
+  contactShadow: {fileID: 4300000, guid: d4df13ddbb2f4044fa2f7588abb8b631, type: 2}
+  palette:
+  - {fileID: 2100000, guid: ce50c5cff6da21b4b8f5f2a07238f7e3, type: 2}
+  - {fileID: 2100000, guid: 5bfc00535388dc444a27b47555ba56e1, type: 2}
+  - {fileID: 2100000, guid: 7f00aefa4a9c9574bbe53322a9144832, type: 2}
+  - {fileID: 2100000, guid: ba6d5964d236f9e49ab50514bbdd7fd2, type: 2}
+  - {fileID: 2100000, guid: 77a778ea107c690459a7999a06f153dd, type: 2}
+  - {fileID: 2100000, guid: 41df84e2bb35856469da7c71bd15876b, type: 2}
+  - {fileID: 2100000, guid: bb6bab057c6deab48b0f1ec81570a101, type: 2}
+  tray: {fileID: 2100000, guid: cea5bb54e5573354b9b13ef27400321a, type: 2}
+  shadow: {fileID: 2100000, guid: 74a12c0881841b847a0a169d5beb827f, type: 2}
+  clips:
+  - {fileID: 8300000, guid: 6fb45499bb544febbcdc18ed4e9775b8, type: 3}
+  - {fileID: 8300000, guid: 3e3eed65ef894f41b39b41a210f6ccc1, type: 3}
+  - {fileID: 8300000, guid: 4267893b84c2484ab0338b1e256438c8, type: 3}
+  - {fileID: 8300000, guid: de80f965c2074919a69aa1472b7e6005, type: 3}
+  - {fileID: 8300000, guid: 4fb7e0ec1d7f4460a208a6480246f9a4, type: 3}
+  - {fileID: 8300000, guid: b4b36693262846b7ad177bba895a0c19, type: 3}
+  backgroundSrgb: {r: 0.9529412, g: 0.9607843, b: 0.96862745, a: 1}
+  inkSrgb: {r: 0.15686275, g: 0.21568628, b: 0.2784314, a: 1}
