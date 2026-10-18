@@ -28,6 +28,7 @@ namespace ColorSlide.Gameplay
         public InteractionBoard Board => board;
         public PointerDragController Drag => drag;
         public IReadOnlyList<ExitGateView> GateViews => gateViews;
+        public bool IsPresentingExit => exiting != null;
         public bool CanInteract => isActiveAndEnabled && Session != null &&
             Session.State == GameplayState.Playing && exiting == null;
 
@@ -51,7 +52,16 @@ namespace ColorSlide.Gameplay
         {
             if (Session != null)
                 return;
-            Session = CreateSession();
+            InitializeSession(CreateSession());
+        }
+
+        // Campaign construction injects its already validated session before this inactive hierarchy is enabled.
+        internal void InitializeSession(PuzzleSession session)
+        {
+            if (Session != null || session == null)
+                throw new InvalidOperationException("Initialize a fresh gameplay controller with one session.");
+            Session = session;
+            timeLimit = (float)session.InitialSeconds;
             board.AdoptModel(Session.Board);
             foreach (var view in board.BlockViews)
             foreach (var collider in view.GetComponentsInChildren<Collider>(true))

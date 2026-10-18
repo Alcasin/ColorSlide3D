@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 537fc1d055a64205a8fa0e024872258b, type: 3}
+  m_Name: Level02
+  m_EditorClassIdentifier: ColorSlide.Runtime::ColorSlide.Gameplay.LevelDefinition
+  data:
+    Id: 02-make-space
+    DisplayName: Make Space
+    Width: 6
+    Height: 8
+    CellSize: 0.68
+    Seconds: 180
+    Blocks:
+    - Id: Blue
+      Color: 1
+      Anchor: {x: 2, y: 1}
+      Cells:
+      - {x: 0, y: 0}
+    - Id: Amber
+      Color: 2
+      Anchor: {x: 1, y: 3}
+      Cells:
+      - {x: 0, y: 0}
+      - {x: 1, y: 0}
+    - Id: Purple
+      Color: 3
+      Anchor: {x: 4, y: 5}
+      Cells:
+      - {x: 0, y: 0}
+      - {x: 0, y: 1}
+    Obstacles: []
+    Gates:
+    - Id: Blue North
+      Color: 1
+      Edge: 0
+      Start: 2
+      Span: 1
+    - Id: Amber South
+      Color: 2
+      Edge: 1
+      Start: 1
+      Span: 2
+    - Id: Purple East
+      Color: 3
+      Edge: 2
+      Start: 5
+      Span: 2
