@@ -139,10 +139,12 @@ namespace ColorSlide.Gameplay
                 if (softCubeBursts)
                 {
                     var burst = root.AddComponent<SoftCubeBurst>(); burst.Configure(theme, size); gameplay.ConfigureExitBurst(burst);
+                    burst.ConfigureFraming(interactionCamera.GetComponent<PortraitCameraFit>());
                 }
                 if (theme != null)
                     foreach (var view in views) view.gameObject.AddComponent<PolishedBlockVisual>().Configure(view, gameplay, size, gameplayFeedback);
                 if (gameplayFeedback) root.AddComponent<GateGlow>().Configure(gameplay);
+                interactionCamera.GetComponent<PortraitCameraFit>()?.FrameBoard(root.transform, level);
                 return gameplay; // Caller retires the old hierarchy before activating this one.
             }
             catch { Retire(root); throw; }

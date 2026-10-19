@@ -18,9 +18,11 @@ namespace ColorSlide.Polish
         private SoftBurstPiece[] pieces;
         private Transform fragmentRoot;
         private Transform[] fragments;
+        private PortraitCameraFit framing;
         public bool IsRunning => target != null;
         public int ActiveFragmentCount => fragmentRoot != null && fragmentRoot.gameObject.activeSelf ? SoftBurstMotion.FragmentCount : 0;
         public SoftToyTheme Theme => theme;
+        public void ConfigureFraming(PortraitCameraFit cameraFit) => framing = cameraFit;
         public void Configure(SoftToyTheme assets, float size)
         {
             if (assets == null || float.IsNaN(size) || float.IsInfinity(size) || size <= 0f)
@@ -59,7 +61,8 @@ namespace ColorSlide.Polish
         {
             var material = target.CellRenderers[0].sharedMaterial;
             fragmentRoot = new GameObject("Soft Cube Burst").transform;
-            fragmentRoot.SetParent(transform, false); fragmentRoot.position = end;
+            fragmentRoot.SetParent(transform, false);
+            fragmentRoot.position = framing != null ? framing.VisibleBurstOrigin(end, pieces, cellSize) : end;
             fragments = new Transform[pieces.Length];
             for (var i = 0; i < pieces.Length; i++)
             {

@@ -21,11 +21,15 @@ namespace ColorSlide.Gameplay
 
         public CampaignSession CreateCampaign()
         {
-            if (levels == null || levels.Length != 4 || levels.Any(level => level == null) || presentation == null)
-                throw new InvalidOperationException("M3 requires four ordered LevelDefinition assets and its presentation.");
+            if (levels == null || levels.Length == 0 || levels.Any(level => level == null) || presentation == null)
+                throw new InvalidOperationException("Campaign requires ordered LevelDefinition assets and its presentation.");
             presentation.ValidateResources();
             foreach (var level in levels) level.CreateSession();
-            return new CampaignSession(levels.Select(level => level.Data));
+            var data = levels.Select(level => level.Data);
+            // FeedbackCampaign already opts into the complete accepted M4.5 presentation. Extend that
+            // experience without modifying its serialized scene or any earlier milestone campaign.
+            if (presentation.GameplayFeedback) data = FeedbackCampaignLevels.Complete(data);
+            return new CampaignSession(data);
         }
 
         private void OnEnable()
@@ -65,6 +69,24 @@ namespace ColorSlide.Gameplay
             { Debug.LogError("ColorSlide M3 transition stopped: " + exception.Message, this); return false; }
         }
         public void Restart() { if (Gameplay != null) Gameplay.Restart(); }
+#if UNITY_EDITOR
+        // Used by Editor Game View shortcuts only. Build/retire/activate/notify exactly as Next does,
+        // including cancellation of an unfinished drag, exit burst and the former level's owned effects.
+        public bool StartEditorLevel(int index)
+        {
+            if (!Application.IsPlaying(gameObject) || !isActiveAndEnabled || Campaign == null ||
+                presentation == null || !presentation.GameplayFeedback || index < 4 || index >= Campaign.LevelCount) return false;
+            try
+            {
+                GameplayController replacement = null;
+                if (!Campaign.StartEditorLevel(index, (data, session) => replacement = presentation.Build(data, session))) return false;
+                ActivateReplacement(replacement);
+                return true;
+            }
+            catch (Exception exception)
+            { Debug.LogError("ColorSlide Editor QA level selection stopped: " + exception.Message, this); return false; }
+        }
+#endif
         private void OnDisable()
         {
             if (Gameplay != null) Gameplay.gameObject.SetActive(false);

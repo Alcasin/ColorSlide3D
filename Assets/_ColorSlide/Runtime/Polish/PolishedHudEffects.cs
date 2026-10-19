@@ -20,7 +20,8 @@ namespace ColorSlide.Polish
             if (hud == null || hud.Campaign == null || hud.Campaign.Campaign == null || hud.Gameplay == null) return;
             var campaign = hud.Campaign.Campaign;
             levelNumber.text = "LEVEL " + (campaign.CurrentIndex + 1).ToString("00") + " / " + campaign.LevelCount.ToString("00");
-            resultCaption.text = campaign.IsComplete ? "Four little puzzles, beautifully solved." :
+            resultCaption.text = campaign.IsComplete ? (campaign.LevelCount == 4 ? "Four little puzzles, beautifully solved." :
+                "All " + campaign.LevelCount + " puzzles, beautifully solved.") :
                 hud.Gameplay.Session.State == GameplayState.Failed ? "Take a breath, then try again." : "Every piece found its way home.";
             var hasNext = nextButton.gameObject.activeSelf;
             var min = new Vector2(hasNext ? 0.08f : 0.30f, 0.12f); var max = new Vector2(hasNext ? 0.46f : 0.70f, 0.30f);

@@ -1,5 +1,11 @@
 # ColorSlide3D — M0 foundation
 
+Current gameplay milestone: **M4.6 Phase B**, eight levels in the existing `FeedbackCampaign` scene.
+Allow Unity to compile and press Play; no Apply step is needed. Editor Game View keys **5–8** select the four advanced levels.
+See [master challenge implementation, solutions and QA](docs/M4.6-Phase-B-Master-Levels.md) and the [earlier M4.6 report](docs/M4.6-Advanced-Levels.md).
+Levels 7–8 now default to **1.25x zoom**. Focus Game View and use **Equals/Plus / Minus** (or numpad equivalents)
+to adjust 1.00–1.25x live; see [zoom configuration, measurements and QA](docs/M4.6-Adjustable-Zoom.md).
+
 Unity **6000.3.8f1 LTS**, Universal 3D/URP, intended for Android portrait.
 M0 prepares the project and a 3D rendering scene. Gameplay is outside this milestone.
 

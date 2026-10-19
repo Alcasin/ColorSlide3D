@@ -31,13 +31,28 @@ namespace ColorSlide.Gameplay
         public bool Next(Action<LevelData, PuzzleSession> prepare = null)
         {
             if (!CanNext) return false;
-            var next = levels[CurrentIndex + 1].CreateSession();
+            StartLevel(CurrentIndex + 1, prepare);
+            return true;
+        }
+
+#if UNITY_EDITOR
+        // Zero-based, in-memory QA selection. This entry point does not exist in player assemblies.
+        public bool StartEditorLevel(int index, Action<LevelData, PuzzleSession> prepare = null)
+        {
+            if (index < 0 || index >= levels.Length) return false;
+            StartLevel(index, prepare);
+            return true;
+        }
+#endif
+
+        private void StartLevel(int index, Action<LevelData, PuzzleSession> prepare)
+        {
+            var next = levels[index].CreateSession();
             next.Start();
             // Runtime can stage an inactive hierarchy before progression commits. A construction failure keeps this level.
-            prepare?.Invoke(levels[CurrentIndex + 1], next);
-            CurrentIndex++;
+            prepare?.Invoke(levels[index], next);
+            CurrentIndex = index;
             CurrentSession = next;
-            return true;
         }
     }
 }
