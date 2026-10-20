@@ -1,126 +1,108 @@
-# ColorSlide3D — M0 foundation
+# ColorSlide3D
 
-Current gameplay milestone: **M4.6 Phase B**, eight levels in the existing `FeedbackCampaign` scene.
-Allow Unity to compile and press Play; no Apply step is needed. Editor Game View keys **5–8** select the four advanced levels.
-See [master challenge implementation, solutions and QA](docs/M4.6-Phase-B-Master-Levels.md) and the [earlier M4.6 report](docs/M4.6-Advanced-Levels.md).
-All eight levels now use **adaptive ~90% tray-width framing**, preserving the approved Level 7–8 composition.
-Focus Game View and use **Equals/Plus / Minus** (or numpad equivalents) to adjust the 1.00–1.25 control;
-see [unified framing, before/after measurements and QA](docs/M4.6-Unified-Camera-Framing.md).
+A portrait 3D sliding-block puzzle built with Unity 6 and C#. Route colored pieces through matching gates and clear the board before time runs out.
 
-Unity **6000.3.8f1 LTS**, Universal 3D/URP, intended for Android portrait.
-M0 prepares the project and a 3D rendering scene. Gameplay is outside this milestone.
+The engineering focus is deterministic puzzle rules, reusable level presentation, automated tests, and responsive visual and audio feedback.
 
-## First Unity Editor QA
+## Gameplay video
 
-1. Open this project in Unity 6000.3.8f1 and allow import/compilation to finish. Save any
-   open scene edits. No setup code runs automatically on import.
-2. Run **ColorSlide > Setup > Apply M0 Foundation**. This creates
-   `Assets/_ColorSlide/Scenes/Gameplay.unity` and
-   `Assets/_ColorSlide/Materials/BoardPlaceholder.mat` through Unity APIs, then applies
-   Portrait and the 1080 × 1920 reference resolution through `PlayerSettings` APIs.
-3. Run **ColorSlide > Setup > Open Gameplay**. This opens Gameplay alone after checking
-   that all currently loaded scenes are saved. Choose a **1080 × 1920** fixed resolution
-   or **9:16** aspect in Game View; the reference resolution does not select a Game View
-   preset automatically. Verify a lit neutral board with visible thickness and a dark
-   background, viewed from above at a slight angle. There should be no pink material.
-4. Run **Apply M0 Foundation** again, then **Validate M0 Foundation**. Confirm the scene
-   has one camera, one directional light and one board, with no changed authored values.
-5. In **Window > General > Test Runner > EditMode**, run **ColorSlide.Tests.EditMode**
-   (five tests). Setup must have succeeded, and open scenes must be saved first.
-6. Check the Console. Actual Editor compilation, visual QA, and Test Runner results are
-   manual acceptance checks; static compilation is not a substitute.
+**ColorSlide3D — Full Gameplay Showcase**
 
-No Input Handling change or restart is currently required: the inspected project already
-uses **Input System Package (New)** (`activeInputHandler: 1`). If changed later, use
-**Edit > Project Settings > Player > Other Settings > Configuration > Active Input Handling >
-Input System Package (New)** and accept Unity's requested Editor restart. Setup reports a
-disabled backend and does not modify undocumented serialized PlayerSettings fields.
+The approved continuous recording covers all eight levels and the Campaign Complete screen: **2:29.6**, **1080×1920** portrait, **60 FPS** nominal, with in-game audio.
 
-## Project layout and assemblies
+**Video link pending:** the MP4 is ready for manual upload as a GitHub Release asset. It is kept outside the source repository. See the [media report and upload instructions](docs/M5-C-Portfolio-Media.md#manual-github-release-upload).
 
-All new Unity assets live under `Assets/_ColorSlide/`:
+## Screenshots
 
-| Folder | Purpose |
-| --- | --- |
-| `Runtime/Input` | `PointerActions`, a small typed accessor for the authored action map |
-| `Editor` | Explicit setup and read-only validation commands |
-| `Tests/EditMode` | Configuration, scene, non-mutating validation, repeatability and unsaved-edit tests |
-| `Input` | `ColorSlide.inputactions` |
-| `Scenes`, `Materials` | Unity-created Gameplay scene and placeholder material |
-| `Prefabs`, `Art`, `Audio` | Reserved asset locations; no content or systems yet |
+Six genuine frames from the approved recording. Select an image to view its original **1080×1920** PNG.
 
-`ColorSlide.Runtime` references `Unity.InputSystem` and has no Editor dependency.
-`ColorSlide.Editor` is Editor-only and references Runtime, Input System and URP.
-`ColorSlide.Tests.EditMode` is Editor-only, marked as a test assembly, references the two
-project assemblies, Input System and the Unity test runners, and explicitly references NUnit.
-Namespaces follow `ColorSlide`, `ColorSlide.Input`, `ColorSlide.Editor` and
-`ColorSlide.Tests.EditMode`.
+<table>
+  <tr>
+    <td align="center"><a href="docs/media/screenshots/01-basic-gameplay.png"><img src="docs/media/screenshots/01-basic-gameplay.png" width="260" alt="Level 1 Basic Exits with two colored pieces and matching gates"></a><br><strong>Basic gameplay</strong><br>Level 1 — Basic Exits</td>
+    <td align="center"><a href="docs/media/screenshots/02-block-interaction.png"><img src="docs/media/screenshots/02-block-interaction.png" width="260" alt="Selected purple piece among blocks and obstacles in Level 4"></a><br><strong>Block interaction</strong><br>Level 4 — Combined Constraints</td>
+  </tr>
+  <tr>
+    <td align="center"><a href="docs/media/screenshots/03-soft-cube-burst.png"><img src="docs/media/screenshots/03-soft-cube-burst.png" width="260" alt="Purple exit fragments beside the matching gate in Level 4"></a><br><strong>Soft Cube Burst</strong><br>Cosmetic exit feedback</td>
+    <td align="center"><a href="docs/media/screenshots/04-traffic-lock.png"><img src="docs/media/screenshots/04-traffic-lock.png" width="260" alt="Level 5 Traffic Lock with seven pieces on its obstacle-filled board"></a><br><strong>Traffic Lock</strong><br>Level 5 — 7×9 board</td>
+  </tr>
+  <tr>
+    <td align="center"><a href="docs/media/screenshots/05-final-lockdown.png"><img src="docs/media/screenshots/05-final-lockdown.png" width="260" alt="Level 8 Final Lockdown with twelve pieces on its 8 by 11 board"></a><br><strong>Final Lockdown</strong><br>Level 8 — 8×11 board</td>
+    <td align="center"><a href="docs/media/screenshots/06-campaign-complete.png"><img src="docs/media/screenshots/06-campaign-complete.png" width="260" alt="Campaign Complete screen after solving all eight puzzles"></a><br><strong>Campaign Complete</strong><br>Final result and celebration</td>
+  </tr>
+</table>
 
-`PointerActions` keeps one useful runtime assembly available without a placeholder
-manager. It only resolves the existing `Pointer` map and its named actions. It does not
-clone or enable the asset, register callbacks, or process input. Nothing is attached to
-the scene to run gameplay logic.
+[Source timestamps and integrity checks](docs/M5-C-Portfolio-Media.md#screenshot-provenance)
 
-## Input and scene conventions
+## Gameplay
 
-The `Pointer` action map contains:
+- Drag squares, rectangles and L-shaped pieces using mouse or primary touch.
+- Navigate obstacles and occupied cells; exits must match the piece's color and width.
+- Clear every piece to win. Restart/Retry restores the current puzzle; Next advances after a win.
+- Progress through eight authored levels. Progress is held in memory for the current Play session.
 
-| Action | Type | Binding |
+| Level | Board | Puzzle focus |
 | --- | --- | --- |
-| `Position` | Value / Vector2 | `<Pointer>/position` |
-| `Press` | Button | `<Pointer>/press` |
+| 1 — Basic Exits | 6×8 | Learn dragging and color-matched exits |
+| 2 — Make Space | 6×8 | Move one piece to open another's route |
+| 3 — Irregular Footprints | 6×8 | Route L-shaped pieces around obstacles |
+| 4 — Combined Constraints | 6×8 | Coordinate several shapes and shared routes |
+| 5 — Traffic Lock | 7×9 | Resolve congestion and transfer-lane dependencies |
+| 6 — Grand Escape | 8×10 | Plan movement across separated board regions |
+| 7 — Chain Reaction | 8×11 | Build a sequence of dependent rearrangements |
+| 8 — Final Lockdown | 8×11 | Manage the campaign's most crowded challenge |
 
-Generic pointer controls cover a mouse's primary button and a touchscreen's primary
-touch. The Button action retains default press/release behavior; future code can use its
-press and release state or phases. This is preparation for one pointer interaction,
-without multi-touch gestures, selection, dragging or raycasts. The imported asset stays
-disabled until future code explicitly enables it. The original template input asset and
-its project-wide assignment are preserved; M0 does not replace that assignment or add
-PlayerInput/UI modules. See Unity's [pointer documentation](https://docs.unity3d.com/Packages/com.unity.inputsystem@1.18/manual/Pointers.html).
+## Implementation highlights
 
-World **X** is board horizontal, **Z** is board vertical, and **Y** is height. The board is
-a cube scaled to a thin slab, with its top at Y=0 and its collider removed. Its initial
-6 × 8 × 0.25 dimensions are editable visual placeholders, not a grid or level definition.
-The fixed orthographic camera's transform and size are ordinary Inspector values. The
-material uses URP/Lit and a directional light supplies basic lighting; no Global Volume
-or camera controller is needed in the new scene.
+- **Puzzle model:** `GridBoard` validates exact footprints, cardinal movement, swept paths and legal exits. `PuzzleSession` owns time, results and restart snapshots. Raycasts select pieces; physics does not decide moves.
+- **Campaign presentation:** `CampaignSession` handles progression; `LevelPresentation` builds and retires owned scene objects. ScriptableObject levels 1–4 and source-authored levels 5–8 share one validation/presentation pipeline.
+- **Input and HUD:** Input System pointer actions, persistent imported UI action references, UGUI controls, safe-area layout and protection against dragging through UI.
+- **Adaptive camera:** orthographic fitting targets ~90% tray width within board, gate, HUD and safe-area constraints, without scaling the logical grid.
+- **Authoring validation:** bounded Editor search and stored solution witnesses exercise production rules. Master-level witnesses are valid solutions, not claimed shortest solutions.
 
-## Setup safety
+Rounded geometry, contact shadows and selection feedback give the board a toy-plastic appearance. **Soft Cube Burst is cosmetic animation, not Rigidbody destruction.** Gate pulses, blocked-contact feedback, timer urgency and win celebration accompany six synthesized cues: Select, Blocked, Exit, UiClick, Win and Fail.
 
-- Setup refuses Play Mode, compilation, Prefab Mode and any unsaved open scene. It
-  reports the reason and makes no changes in those cases. Save/discard edits explicitly
-  and rerun the command.
-- Existing Gameplay and board material assets are checked before any writes. Valid
-  assets are reused without being resaved or reset. Incompatible path contents, missing
-  required objects or broken framing cause a diagnostic instead of automatic repair.
-  Fix the reported conflict in Inspector; do not delete customized assets to rerun setup.
-- Scene creation uses a temporary additive scene and restores the user's active scene
-  and loaded scene arrangement. Validation opens and closes an isolated preview scene
-  and checks the **saved** scene; save authored changes before validating them.
-- Running setup again reapplies only the three required project settings (Portrait,
-  reference width and height). Other PlayerSettings, URP assets, build target, build scene
-  list and template files remain unchanged. The explicit Open Gameplay command opens
-  the saved scene alone for QA. SampleScene remains in the original build scene list;
-  build-profile configuration is deferred.
-- No menu performs an Android switch, build, package install or destructive cleanup.
-  File creation can still fail due to disk/permission problems; partial newly created
-  assets are retained for inspection, and setup reports the error.
+## Technology
 
-## Environment and Git
+| Area | Stack |
+| --- | --- |
+| Engine / language | Unity **6000.3.8f1 LTS**, C# |
+| Rendering | Universal Render Pipeline **17.3.0** |
+| Input / interface | Input System **1.18.0**, UGUI **2.0.0** |
+| Tests | Unity Test Framework **1.6.0**, NUnit EditMode tests |
+| Target presentation | Android portrait; 1080×1920 reference layout |
 
-Installed packages: URP **17.3.0**, Input System **1.18.0**, Test Framework **1.6.0**.
-The original template includes PC and Mobile pipeline/renderer assets, with Mobile the
-Android quality default. These and all package dependencies were preserved.
+## Open and play
 
-Android Build Support and the bundled SDK, NDK and OpenJDK were found for this Editor.
-No device connection, SDK execution, platform switch or Android build has been verified.
-On a different machine install **Android Build Support**, **Android SDK & NDK Tools**,
-and **OpenJDK** through Unity Hub for this Editor version before Android build QA.
+1. Clone/download the repository and add its root folder to Unity Hub.
+2. Open with **Unity 6000.3.8f1**; let packages import and compilation finish.
+3. Open `Assets/_ColorSlide/Scenes/FeedbackCampaign.unity`.
+4. Choose **1080×1920 fixed resolution** in Game View and press **Play**. No setup/Apply commands are needed.
 
-A local Git repository was initialized at this project root after confirming there was
-no parent repository. `.gitignore` excludes generated Unity/IDE/build data while retaining
-assets and `.meta` files. `.gitattributes` treats Unity YAML as text and common imported
-media as binary. No UnityYAMLMerge driver, LFS dependency, remote, commit or push was
-configured. Make your first checkpoint only after successful Unity QA.
+Editor QA: focus Game View and press **5–8** for advanced levels. **Equals/Plus** and **Minus** (also numpad; Shift+Equals supported) adjust the temporary **1.00–1.25** camera control in 0.01 steps. Default: **1.25**. QA controls are excluded from player builds and save no progression/overrides.
 
-Static verification and its limits are recorded in [docs/M0-Validation.md](docs/M0-Validation.md).
+## Testing and validation
+
+Latest author-confirmed Unity EditMode result: **243/243 passed**. Static audit: Runtime, Android-defined Runtime, Editor and Tests compiled; **179 managed cases passed**, zero failures. The audit did not rerun the 64 cases requiring native Unity services.
+
+Coverage spans movement/occupancy, exits, timers, restart/progression, solution witnesses, cleanup, UI references, keyboard shortcuts, camera bounds and pointer projection.
+
+Run `ColorSlide.Tests.EditMode` in **Window > General > Test Runner > EditMode** after saving scene edits. `Tools/Verify-M46.ps1` optionally compiles and runs managed checks using locally imported Unity dependencies, without launching Unity.
+
+See the [final project audit](docs/M5-Project-Audit.md) for evidence, configuration limits and outstanding checks.
+
+## Project status and source map
+
+The eight-level Editor prototype and gameplay recording are accepted; six portfolio screenshots are ready and the external video link awaits manual Release publication. Physical Android testing, APK release and Google Play publication are unverified. Build Settings still points to template `SampleScene`. Render-settings reference debt and release-configuration gaps are recorded in the audit.
+
+| Location | Responsibility |
+| --- | --- |
+| `Assets/_ColorSlide/Runtime/Board`, `Gameplay` | Grid rules, level data, sessions, campaign and presentation |
+| `Assets/_ColorSlide/Runtime/Input`, `Interaction`, `Polish` | Pointer handling, views, camera, feedback and audio playback |
+| `Assets/_ColorSlide/Editor` | Authoring/validation tools, solver witnesses and Play Mode QA controls |
+| `Assets/_ColorSlide/Tests/EditMode` | Automated regression suite |
+| `Assets/_ColorSlide/Scenes/FeedbackCampaign.unity` | Current playable entry scene |
+| `docs`, `Tools` | Technical reports, portfolio preparation and managed validation |
+
+[Camera framing details](docs/M4.6-Unified-Camera-Framing.md) · [Master-level design and witnesses](docs/M4.6-Phase-B-Master-Levels.md) · [CV and portfolio descriptions](docs/M5-Portfolio-Descriptions.md)
+
+No repository-wide LICENSE is included. Custom content coexists with Unity resources/packages; see the [asset and licensing audit](docs/M5-Project-Audit.md#assets-and-licensing).
