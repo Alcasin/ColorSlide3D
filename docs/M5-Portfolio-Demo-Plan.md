@@ -1,6 +1,6 @@
 # ColorSlide3D — Portfolio demo and screenshot plan
 
-**M5-C update, 2026-10-20:** the owner chose the approved **2:29.6 continuous gameplay recording** instead of the proposed 56-second edit below. Six screenshots have been extracted from that MP4 at native resolution. The [final media report](M5-C-Portfolio-Media.md) contains the actual filenames, timestamps and manual GitHub Release workflow. The MP4 stays outside the main repository. The following M5-A shot list and image-sequence workflow are historical proposals, not additional required capture or editing work.
+**M5-C final update, 2026-10-21:** the owner chose the approved **2:29.6 continuous gameplay recording** instead of the proposed 56-second edit below and published [ColorSlide3D — Full Gameplay Showcase](https://github.com/Alcasin/ColorSlide3D/releases/tag/portfolio-showcase-v1). Six screenshots have been extracted from that MP4 at native resolution. The [final media report](M5-C-Portfolio-Media.md) contains the actual filenames, timestamps and published Release details. The MP4 stays outside the main repository. The following M5-A shot list and image-sequence workflow are historical proposals, not additional required capture or editing work.
 
 M5-A preparation, 2026-10-20. No footage, screenshots, recorder assets or packages were created by this stage. Capture the accepted project at checkpoint `9102737`; preserve its levels, camera, HUD, lighting, audio and animation settings.
 
@@ -88,4 +88,4 @@ Once the capture copy and Recorder are prepared, the unavoidable manual work is:
 
 No need to rerun setup menus, change scenes/timers, install an Android build or edit puzzle data. If Recorder causes compilation errors in the capture copy, stop capture preparation there and report them instead of changing the accepted project.
 
-Raw files stay under the capture copy's `Recordings/` directory. M5-C supersedes the earlier proposed repository MP4 destination: distribute `ColorSlide3D_Full_Gameplay_Showcase.mp4` as a GitHub Release asset, retain only the selected PNGs in the main repository, and add the verified video URL after manual publication. See the [current media handoff](M5-C-Portfolio-Media.md). M5-A itself performed no editing, publishing or committing.
+Raw files stay under the capture copy's `Recordings/` directory. M5-C supersedes the earlier proposed repository MP4 destination: `ColorSlide3D_Full_Gameplay_Showcase.mp4` is distributed through the published GitHub Release, while only the selected PNGs are stored in the main repository. The README now links to that Release. See the [current media handoff](M5-C-Portfolio-Media.md). M5-A itself performed no editing, publishing or committing.

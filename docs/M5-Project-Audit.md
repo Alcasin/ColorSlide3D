@@ -1,6 +1,6 @@
 # ColorSlide3D — M5-A final project audit
 
-**M5-C media status, 2026-10-20:** the separate capture project now contains an approved 2:29.6 gameplay recording. Six genuine screenshots and the README gallery are prepared; manual Release upload and the real video URL remain pending. See the [media report](M5-C-Portfolio-Media.md). This is a status update to the historical M5-A audit below; it does not constitute a new compilation, test run or resolution of the recorded configuration/licensing findings.
+**M5-C final media status, 2026-10-21:** the approved 2:29.6 continuous gameplay recording is published as [ColorSlide3D — Full Gameplay Showcase](https://github.com/Alcasin/ColorSlide3D/releases/tag/portfolio-showcase-v1). The README links to the Release and includes six genuine screenshots. See the [media report](M5-C-Portfolio-Media.md). This is a status update to the historical M5-A audit below; it does not constitute a new compilation, test run or resolution of the recorded configuration/licensing findings.
 
 Audit date: **2026-10-20**. Baseline: **`9102737` on `main`**, with a clean working tree before M5-A. The configured remote is `https://github.com/Alcasin/ColorSlide3D.git`; this audit examines the local checkout, not the live GitHub page.
 

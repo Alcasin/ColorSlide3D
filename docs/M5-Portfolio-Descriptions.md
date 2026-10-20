@@ -1,6 +1,6 @@
 # ColorSlide3D — CV and portfolio descriptions
 
-These descriptions reflect the inspected M0–M4.6 implementation at checkpoint `9102737`. The native test result is owner-reported; the M5-A static audit independently ran the managed subset. The approved gameplay recording and six genuine screenshots are now prepared; the [external video link awaits manual Release publication](M5-C-Portfolio-Media.md).
+These descriptions reflect the inspected M0–M4.6 implementation at checkpoint `9102737`. The native test result is owner-reported; the M5-A static audit independently ran the managed subset. The approved gameplay recording is published as [ColorSlide3D — Full Gameplay Showcase](https://github.com/Alcasin/ColorSlide3D/releases/tag/portfolio-showcase-v1), alongside six genuine screenshots in the README.
 
 ## CV project entry
 
@@ -26,4 +26,4 @@ The [project audit](M5-Project-Audit.md) maps these claims to source files. The 
 
 “Android portrait-oriented prototype” describes the target configuration and input implementation. It does not claim a tested Android device matrix, a shipped APK, a store release, measured mobile performance, commercial use or persistent saved progression. The solver validates witnesses; the master witnesses are not advertised as proven shortest solutions.
 
-Use “cosmetic burst animation” rather than “physics-based destruction.” Keep the project description focused on the systems demonstrated in code and actual captured gameplay. Add the demo URL only after the reviewed MP4 is published and its real Release asset link is verified.
+Use “cosmetic burst animation” rather than “physics-based destruction.” Keep the project description focused on the systems demonstrated in code and actual captured gameplay. Use the verified Release page linked above for the full gameplay showcase.

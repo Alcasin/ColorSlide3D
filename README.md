@@ -10,7 +10,9 @@ The engineering focus is deterministic puzzle rules, reusable level presentation
 
 The approved continuous recording covers all eight levels and the Campaign Complete screen: **2:29.6**, **1080×1920** portrait, **60 FPS** nominal, with in-game audio.
 
-**Video link pending:** the MP4 is ready for manual upload as a GitHub Release asset. It is kept outside the source repository. See the [media report and upload instructions](docs/M5-C-Portfolio-Media.md#manual-github-release-upload).
+**[Watch / Download Full Gameplay Showcase](https://github.com/Alcasin/ColorSlide3D/releases/tag/portfolio-showcase-v1)**
+
+The MP4 is available in the GitHub Release's **Assets** section and is kept outside the source repository. See the [media report](docs/M5-C-Portfolio-Media.md#published-github-release).
 
 ## Screenshots
 
@@ -92,7 +94,7 @@ See the [final project audit](docs/M5-Project-Audit.md) for evidence, configurat
 
 ## Project status and source map
 
-The eight-level Editor prototype and gameplay recording are accepted; six portfolio screenshots are ready and the external video link awaits manual Release publication. Physical Android testing, APK release and Google Play publication are unverified. Build Settings still points to template `SampleScene`. Render-settings reference debt and release-configuration gaps are recorded in the audit.
+The eight-level Editor prototype and gameplay recording are accepted; six portfolio screenshots and the published gameplay showcase are available. Physical Android testing, APK release and Google Play publication are unverified. Build Settings still points to template `SampleScene`. Render-settings reference debt and release-configuration gaps are recorded in the audit.
 
 | Location | Responsibility |
 | --- | --- |

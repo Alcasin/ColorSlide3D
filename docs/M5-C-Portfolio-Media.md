@@ -1,6 +1,6 @@
 # ColorSlide3D — M5-C portfolio media handoff
 
-Prepared **2026-10-20** for owner review. Official video title: **ColorSlide3D — Full Gameplay Showcase**. The approved continuous recording replaces the earlier proposed 56-second edit. No video editing, re-encoding or publication was performed.
+Media prepared **2026-10-20**; documentation finalized **2026-10-21** following the owner's Release publication. Official video title: **ColorSlide3D — Full Gameplay Showcase**. The approved continuous recording replaces the earlier proposed 56-second edit. No video editing or re-encoding was performed.
 
 ## Approved source and verification
 
@@ -19,7 +19,7 @@ The source remains in the separate capture project, outside this repository:
 
 The installed OpenCV 4.13.0 FFmpeg backend decoded **all 8,972 frames**, each at 1080×1920. Python ISO BMFF inspection validated container box boundaries, video/audio sample counts and timing tables, and every media chunk's location within `mdat`. Video media duration is 149.5333 seconds; the container presentation ends at 149.600 seconds. These encoded properties are not Android performance measurements.
 
-Representative frames across all eight levels and the final Campaign Complete screen were visually inspected. Audio stream metadata and packet/chunk structure were verified; audio was **not independently decoded or auditioned** during this preparation. This does not establish loudness, synchronization or dropout quality. Listen to the approved file in a local media player before publication if that final listening check has not already been completed.
+Representative frames across all eight levels and the final Campaign Complete screen were visually inspected. Audio stream metadata and packet/chunk structure were verified; audio was **not independently decoded or auditioned** during media preparation. This does not establish loudness, synchronization or dropout quality.
 
 ## Screenshot provenance
 
@@ -44,57 +44,33 @@ The [provenance manifest](media/screenshots/provenance.json) records source/file
 
 ## README and descriptions
 
-The [README](../README.md) places the video status and a **two-column, three-row gallery** before the gameplay details. Each image displays at 260 pixels wide and links to its original PNG. Captions identify the real levels and effects. Image paths, local document links and section anchors are checked; there is no clickable placeholder video URL.
+The [README](../README.md) places the published video link and a **two-column, three-row gallery** before the gameplay details. Each image displays at 260 pixels wide and links to its original PNG. Captions identify the real levels and effects. Image paths, local document links and section anchors are checked; the video link uses the confirmed Release URL.
 
 The professional introduction, eight-level table, mechanics, technology, installation instructions, camera/QA controls, test evidence and project limitations are preserved. CV/portfolio descriptions explicitly mention solver-verified advanced puzzles and Unity EditMode testing without claiming optimal solutions, device testing or publication. The older demo plan and audit have dated status notes so their historical findings remain identifiable.
 
-## Manual GitHub Release upload
+## Published GitHub Release
 
-Suggested release metadata, for manual publication after review:
+The owner has published the showcase. The public Release page was independently opened on **2026-10-21**.
 
 - **Title:** ColorSlide3D — Full Gameplay Showcase
-- **Tag:** `portfolio-showcase-v1` (suggestion only; not created)
-- **Target:** the accepted source checkpoint `9102737` on `main`, or a later reviewed documentation commit containing the same accepted implementation. Confirm the selected revision exists on GitHub before publishing.
-- **Asset:** `ColorSlide3D_Full_Gameplay_Showcase.mp4`, from the capture path above.
+- **Tag:** `portfolio-showcase-v1`
+- **Release revision:** `c52b01c` (portfolio documentation and screenshots)
+- **Attached asset:** `ColorSlide3D_Full_Gameplay_Showcase.mp4`, confirmed by the owner
+- **Verified URL:** [Watch / Download Full Gameplay Showcase](https://github.com/Alcasin/ColorSlide3D/releases/tag/portfolio-showcase-v1)
 
-1. Open [the repository](https://github.com/Alcasin/ColorSlide3D), then **Releases → Draft a new release**.
-2. Choose the suggested tag and confirm **Target** points to the intended accepted revision. Enter the title and description below.
-3. Attach the approved MP4 in the asset upload area. Wait for the upload to finish; verify its filename and size.
-4. **Save draft** for review. After approval, manually **Publish release**. No release or tag is created by this preparation. [GitHub's release instructions](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository?tool=webui)
+Open the Release's **Assets** section and select the MP4 to watch or download the approximately **2:29 continuous showcase of all eight levels**, including Campaign Complete. The direct MP4 asset URL could not be independently verified during this update, so the README uses the verified Release page without guessing a download URL.
 
-The 36.52 MB video fits GitHub's per-asset limit of under 2 GiB. GitHub also supplies source ZIP/tar archives; those are source snapshots, not executable game builds. [GitHub release assets and limits](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases)
+The Release is for portfolio gameplay media. No APK, installer or playable game build is attached; physical Android device testing and Google Play publication have not been performed. The MP4 remains outside the tracked source repository.
 
-Copy-ready release description:
-
-```markdown
-## ColorSlide3D — Full Gameplay Showcase
-
-Continuous gameplay from all eight authored campaign levels, ending at Campaign Complete, recorded from the Unity Editor capture project.
-
-- Video: 2:29.6, 1080×1920 portrait, 60 FPS nominal, with in-game audio.
-- Demonstrates deterministic block movement, color-matched exits, advanced puzzles, responsive portrait framing, and custom visual/audio feedback.
-- Advanced puzzles have solver-verified solution witnesses; shortest-solution optimality is not claimed.
-- Latest author-confirmed Unity EditMode result: 243/243 passed. Media preparation did not rerun the suite.
-
-Attached: ColorSlide3D_Full_Gameplay_Showcase.mp4 (36,519,556 bytes).
-SHA-256: e577f131de79fbabc66f27b39033ba6bd538f44ca2b6c3d9837395f0a4da9781
-
-This portfolio showcase contains a gameplay video. No APK or executable game build is attached. Physical Android device QA and Google Play publication have not been performed.
-```
-
-### Insert the actual video URL after publication
-
-On the published release, expand **Assets** and copy the link address of **ColorSlide3D_Full_Gameplay_Showcase.mp4**. Use that actual asset download link, not a guessed URL or a draft-only link. Check that it downloads the expected video for the intended audience; a signed-out check establishes public access. A downloaded copy can be checked against the SHA-256 above.
-
-Replace the README's entire **Video link pending** paragraph with a Markdown link whose label is **ColorSlide3D — Full Gameplay Showcase** and whose destination is the verified asset URL. Remove the pending status from the project-status paragraph too. The real URL can be inserted in a follow-up after the owner publishes and provides it. No broken clickable placeholder is present now.
+Publication and README linking are complete. This documentation update did not create, modify or republish the Release or its tag.
 
 ## Repository validation and handoff
 
 - README: six unique PNG image paths, six full-resolution image links, two cells per gallery row; local documentation paths and anchors resolve.
 - Media: six PNGs pass decoding/integrity checks; dimensions, source pixel hashes and file hashes match the provenance manifest. The approved source MP4 hash is unchanged.
 - Protected content: all pre-task `Assets`, `Packages`, `ProjectSettings`, `Tools` and other non-documentation repository files are unchanged. Capture-project source, settings, documentation and recordings match the pre-task hash baseline.
-- Changes: README; status/description updates to the three existing M5 documents; this handoff; six PNGs and one provenance manifest. Existing M5-A documents were already untracked before this task.
+- Initial media deliverables: README; status/description updates to the three existing M5 documents; this handoff; six PNGs and one provenance manifest. These deliverables are tracked at Release revision `c52b01c`. Final link updates change only README and the four M5 documents; the gallery images and provenance manifest remain unchanged.
 - No source code or tests changed. No compilation or test run was needed for this documentation/media task. The latest author-confirmed result remains **243/243 Unity EditMode cases passed**; the M5-A audit's separate **179 managed passes** remain historical evidence.
-- No Unity launch, batchmode, GUI automation, package installation, commit, push, tag or Release publication occurred. Git whitespace checks pass.
+- Media preparation and this final link update performed no Unity launch, batchmode, GUI automation, package installation, commit, push, tag creation or Release publication/modification. The owner published the Release separately. Git whitespace checks pass.
 
-**Next action:** review the README gallery and media selection. After approval, upload the unchanged MP4 manually using the release workflow above, then supply its published asset URL for final README insertion.
+**Handoff complete:** the README links to the published showcase and preserves the six-image gallery. No media upload or video-link insertion remains outstanding.
