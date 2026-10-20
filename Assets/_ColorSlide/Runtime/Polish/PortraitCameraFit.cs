@@ -10,8 +10,8 @@ namespace ColorSlide.Polish
     {
         [SerializeField] private float referenceSize = 6.25f;
         [SerializeField, Range(BoardFraming.MinimumZoom, BoardFraming.MaximumZoom)]
-        [InspectorName("Large Board Zoom")]
-        [Tooltip("Default gameplay zoom for boards taller than 10 cells. Earlier levels keep 1x unless adjusted during Editor QA.")]
+        [InspectorName("Gameplay Zoom")]
+        [Tooltip("1 = historical safe frame; 1.25 = adaptive 90% tray-width composition for every level, limited by board/gates/HUD.")]
         // Fresh serialization key avoids retaining the old 1.18 default through script hot reload.
         private float largeBoardDefaultZoom = BoardFraming.DefaultLargeBoardZoom;
         private Camera target;
@@ -39,7 +39,7 @@ namespace ColorSlide.Polish
 #if UNITY_EDITOR
                 if (editorZoom.HasValue) return editorZoom.Value;
 #endif
-                return usePresentationFit ? LargeBoardZoom : 1f;
+                return board != null ? LargeBoardZoom : 1f;
             }
         }
         public float EffectiveZoom { get; private set; } = 1f;
@@ -68,8 +68,8 @@ namespace ColorSlide.Polish
             if (target != null && !movedCamera) originalPosition = target.transform.position;
             board = root; gameplay = root.GetComponent<GameplayController>();
             useBoardFit = level.Width > 6 || level.Height > 8;
-            // Preserve the accepted profiles through 8x10. The current maximum-height boards
-            // use actual presentation geometry, rather than one inflated world-space box.
+            // Historical safe profiles remain the 1.00 endpoint and placement anchor.
+            // The adaptive close composition below is shared by all dimensions.
             usePresentationFit = useBoardFit && level.Height > 10;
             if (target != null)
             {
@@ -117,14 +117,15 @@ namespace ColorSlide.Polish
             }
             else baseline = new BoardFraming.Frame(originalPosition, size);
             if (!ZoomLocked) appliedZoom = ZoomMultiplier;
-            var frame = BoardFraming.Zoom(baseline, playableProjection, appliedZoom, target.transform.right, target.transform.up, aspect, screen, safeArea);
+            var frame = BoardFraming.AdaptiveZoom(baseline, playableProjection, trayProjection, appliedZoom,
+                target.transform.right, target.transform.up, aspect, screen, safeArea);
             EffectiveZoom = baseline.Size / frame.Size;
             return frame;
         }
         public float TrayViewportUtilization(BoardFraming.Frame frame, float aspect) => trayProjection.width / (2f * frame.Size * aspect);
         public Vector3 VisibleBurstOrigin(Vector3 origin, SoftBurstPiece[] pieces, float cellSize)
         {
-            if (target == null || appliedZoom <= 1f || frameScreen.x <= 0f) return origin;
+            if (target == null || frameScreen.x <= 0f) return origin;
             var right = target.transform.right; var up = target.transform.up;
             var local = BoardFraming.Project(BoardFraming.BurstEnvelope(pieces, cellSize, Vector3.zero), right, up);
             return BoardFraming.VisibleBurstOrigin(local, origin, new BoardFraming.Frame(target.transform.position, target.orthographicSize),

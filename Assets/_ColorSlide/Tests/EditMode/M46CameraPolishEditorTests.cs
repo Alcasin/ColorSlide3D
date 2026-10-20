@@ -16,6 +16,9 @@ namespace ColorSlide.Tests.EditMode
             {
                 var camera = owner.Presentation.InteractionCamera; var position = camera.transform.position; var rotation = camera.transform.rotation;
                 var size = camera.orthographicSize; var fitter = camera.GetComponent<PortraitCameraFit>();
+                // Historical case name retained: the unified close default is tested separately.
+                // Preserve exact previous frames and the non-mutating construction check at 1.00.
+                fitter.SetEditorZoom(1f);
                 foreach (var level in owner.Levels.Select(definition => definition.Data).Concat(AdvancedCampaignLevels.Create()))
                 {
                     GameplayController gameplay = null;

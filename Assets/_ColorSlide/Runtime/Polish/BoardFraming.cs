@@ -12,6 +12,7 @@ namespace ColorSlide.Polish
     {
         public const float DefaultLargeBoardZoom = 1.25f;
         public const float MinimumZoom = 1f, MaximumZoom = 1.25f;
+        public const float TargetTrayWidth = 0.90f, MaximumTrayWidth = 0.905f;
 
         public static float ClampZoom(float zoom)
         {
@@ -153,9 +154,52 @@ namespace ColorSlide.Polish
         {
             zoom = ClampZoom(zoom);
             if (zoom == MinimumZoom) return baseline; // Exact historical full-exit frame.
+            return AtSize(baseline, playable, baseline.Size / zoom, right, up, aspect, screen, safeArea);
+        }
+
+        /// <summary>Shared close framing for every board. The control selects progress from the historical
+        /// safe frame to an actual tray-width fit; it is not the same physical multiplier for every level.</summary>
+        public static Frame AdaptiveZoom(Frame baseline, Rect playable, Rect tray, float control,
+            Vector3 right, Vector3 up, float aspect, Vector2 screen, Rect safeArea)
+        {
+            control = ClampZoom(control);
+            var safeWidth = SafeAreaPanel.Normalize(safeArea, screen).width;
+            if (aspect <= 0f || tray.width <= 0f || safeWidth <= 0f) throw new ArgumentOutOfRangeException(nameof(aspect));
+            var reference = Zoom(baseline, playable, MaximumZoom, right, up, aspect, screen, safeArea);
+            var utilization = tray.width / (2f * reference.Size * aspect * safeWidth);
+            // Preserve a composition already at the target, including the approved 8x11 frames.
+            // This tolerance is geometric, not a level ID/dimension exception.
+            var compact = utilization >= TargetTrayWidth - 0.005f && utilization <= MaximumTrayWidth ? reference :
+                CenteredAtSize(baseline, playable, tray.width / (2f * aspect * safeWidth * TargetTrayWidth), right, up, aspect, screen, safeArea);
+            // A legacy fixed camera can be closer than the target on a notched/short viewport.
+            // Normalize that endpoint too, so increasing the control never zooms outward.
+            var start = baseline.Size <= compact.Size ? compact : baseline;
+            if (control == MinimumZoom) return start;
+            if (control == MaximumZoom) return compact;
+            var progress = (control - MinimumZoom) / (MaximumZoom - MinimumZoom);
+            var physicalZoom = 1f + progress * (start.Size / compact.Size - 1f);
+            var size = start.Size / physicalZoom;
+            var blend = start.Size > compact.Size ? (start.Size - size) / (start.Size - compact.Size) : 1f;
+            var position = Vector3.Lerp(start.CameraPosition, compact.CameraPosition, blend);
+            return AtSize(new Frame(position, size), playable, size, right, up, aspect, screen, safeArea);
+        }
+
+        private static Frame CenteredAtSize(Frame baseline, Rect playable, float size, Vector3 right, Vector3 up,
+            float aspect, Vector2 screen, Rect safeArea)
+        {
+            var fit = AtSize(baseline, playable, size, right, up, aspect, screen, safeArea);
+            var region = GameplayRegion(screen, safeArea);
+            var desired = Vector2.Scale(region.center - Vector2.one * 0.5f, new Vector2(fit.Size * aspect, fit.Size)) * 2f;
+            var offset = playable.center - desired - new Vector2(Vector3.Dot(fit.CameraPosition, right), Vector3.Dot(fit.CameraPosition, up));
+            return new Frame(fit.CameraPosition + right * offset.x + up * offset.y, fit.Size);
+        }
+
+        private static Frame AtSize(Frame baseline, Rect playable, float requestedSize, Vector3 right, Vector3 up,
+            float aspect, Vector2 screen, Rect safeArea)
+        {
             var region = GameplayRegion(screen, safeArea);
             var minimum = Math.Max(playable.width / (2f * aspect * region.width), playable.height / (2f * region.height)) * 1.002f;
-            var size = Math.Max(baseline.Size / zoom, minimum);
+            var size = Math.Max(requestedSize, minimum);
             var camera = new Vector2(Vector3.Dot(baseline.CameraPosition, right), Vector3.Dot(baseline.CameraPosition, up));
             var desired = playable.center + (camera - playable.center) * (size / baseline.Size);
             var half = new Vector2(size * aspect, size);

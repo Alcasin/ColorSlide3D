@@ -5,6 +5,7 @@
         "ColorSlide.Runtime",
         "ColorSlide.Editor",
         "Unity.InputSystem",
+        "Unity.InputSystem.TestFramework",
         "UnityEngine.UI",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"

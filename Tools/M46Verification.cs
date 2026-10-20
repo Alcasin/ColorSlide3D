@@ -45,7 +45,7 @@ internal static class M46Verification
         var filter = new OrFilter();
         foreach (var name in new[] { "GridBoardTests","ExitRulesTests","PuzzleSessionTests","CampaignTests","M4PolishTests",
             "M45BurstTests","M45FeedbackMotionTests","M46CampaignTests","M46FramingTests","M46EditorShortcutTests",
-            "M46MasterTests","M46MasterFramingTests","M46CameraPolishTests","M46ZoomTests" })
+            "M46MasterTests","M46MasterFramingTests","M46CameraPolishTests","M46ZoomTests","M46UnifiedFramingTests" })
             filter.Add(new ClassNameFilter("ColorSlide.Tests.EditMode." + name));
         var tests = runner.Run(new Listener(),filter);
         Xml(tests.ToXml(true),Path.Combine(args[1],"managed.xml"));

@@ -122,7 +122,9 @@ namespace ColorSlide.Tests.EditMode
                         if (current != null) LevelPresentation.Retire(current.gameObject); current = replacement;
                         Assert.That(fitter.ZoomMultiplier, Is.EqualTo(1.21f));
                         var screen = M46CameraPolishTests.Screens[0]; var frame = fitter.CalculateFrame(screen, new Rect(0, 0, screen.x, screen.y), screen.x / screen.y);
-                        Assert.That(fitter.EffectiveZoom, Is.EqualTo(1.21f).Within(0.00001f));
+                        var expected = M46UnifiedFramingTests.Frame(campaign.CurrentLevel, screen, new Rect(0, 0, screen.x, screen.y), 1.21f);
+                        var baseline = M46UnifiedFramingTests.Baseline(campaign.CurrentLevel, screen, new Rect(0, 0, screen.x, screen.y));
+                        Assert.That(fitter.EffectiveZoom, Is.EqualTo(baseline.Size / expected.Size).Within(0.00001f));
                         Assert.That(frame.Size, Is.GreaterThan(0)); Assert.That(campaign.CurrentSession.State, Is.EqualTo(GameplayState.Playing));
                     }
                     fitter.ResetEditorZoom(); Assert.That(fitter.ZoomMultiplier, Is.EqualTo(1.25f));
@@ -131,7 +133,7 @@ namespace ColorSlide.Tests.EditMode
                         var replacement = owner.Presentation.Build(level, session);
                         LevelPresentation.Retire(current.gameObject); current = replacement;
                     }), Is.True);
-                    Assert.That(fitter.ZoomMultiplier, Is.EqualTo(1f)); Assert.That(EditorJsonUtility.ToJson(fitter), Is.EqualTo(serialized));
+                    Assert.That(fitter.ZoomMultiplier, Is.EqualTo(1.25f)); Assert.That(EditorJsonUtility.ToJson(fitter), Is.EqualTo(serialized));
                 }
                 finally { if (current != null) LevelPresentation.Retire(current.gameObject); }
             });
@@ -177,20 +179,56 @@ namespace ColorSlide.Tests.EditMode
         [TestCase(Key.NumpadMinus, false, false, -1)] [TestCase(Key.Equals, false, true, 0)]
         public void RealInputSystemKeyboardSupportsPlusEqualsMinusNumpadAndModifierRules(Key key, bool shift, bool control, int expected)
         {
-            var previous = Keyboard.current; Keyboard owned = null;
+            var previous = Keyboard.current;
+            var previousDevices = InputSystem.devices.ToArray();
+            var previousSettings = InputSystem.settings;
+            var previousKeys = previous?.allKeys.Where(item => item.isPressed).Select(item => item.keyCode).ToArray();
+            var input = new InputTestFixture();
+            System.Action readShortcut = null;
             try
             {
-                owned = InputSystem.AddDevice<Keyboard>();
+                // The fixture owns an isolated runtime with Dynamic updates, independent of Editor focus.
+                // Updating the live Editor system instead does not provide player-frame button edges.
+                input.Setup();
+                var owned = InputSystem.AddDevice<Keyboard>();
+                Assert.That(InputSystem.devices, Is.EqualTo(new InputDevice[] { owned }));
+                var method = typeof(M45Feedback).Assembly.GetType("ColorSlide.Editor.CampaignPlayModeShortcuts").GetMethod("ZoomDirection", BindingFlags.NonPublic | BindingFlags.Static);
+                Assert.That(method, Is.Not.Null);
+                var samples = 0; var direction = 0; var updateType = InputUpdateType.None;
+                Keyboard sampledKeyboard = null;
+                var pressed = false; var held = false; var sampledShift = false; var sampledControl = false;
+                readShortcut = () =>
+                {
+                    samples++; updateType = InputState.currentUpdateType; sampledKeyboard = Keyboard.current;
+                    // Sample the actual production reader in the same phase as its Play Mode caller.
+                    direction = (int)method.Invoke(null, new object[] { sampledKeyboard });
+                    pressed = owned[key].wasPressedThisFrame; held = owned[key].isPressed;
+                    sampledShift = owned.shiftKey.isPressed; sampledControl = owned.ctrlKey.isPressed;
+                };
+                InputSystem.onAfterUpdate += readShortcut;
                 var keys = new[] { key }.Concat(shift ? new[] { Key.LeftShift } : new Key[0]).Concat(control ? new[] { Key.LeftCtrl } : new Key[0]).ToArray();
                 InputSystem.QueueStateEvent(owned, new KeyboardState(keys)); InputSystem.Update();
-                var method = typeof(M45Feedback).Assembly.GetType("ColorSlide.Editor.CampaignPlayModeShortcuts").GetMethod("ZoomDirection", BindingFlags.NonPublic | BindingFlags.Static);
-                Assert.That(method, Is.Not.Null); Assert.That(method.Invoke(null, new object[] { owned }), Is.EqualTo(expected));
+                Assert.That(samples, Is.EqualTo(1)); Assert.That(updateType, Is.EqualTo(InputUpdateType.Dynamic));
+                Assert.That(sampledKeyboard, Is.SameAs(owned)); Assert.That(held, Is.True); Assert.That(pressed, Is.True);
+                Assert.That(sampledShift, Is.EqualTo(shift)); Assert.That(sampledControl, Is.EqualTo(control));
+                Assert.That(direction, Is.EqualTo(expected));
+
+                InputSystem.Update(); // A held key must not repeat a zoom step on the next input frame.
+                Assert.That(samples, Is.EqualTo(2)); Assert.That(held, Is.True); Assert.That(pressed, Is.False);
+                Assert.That(direction, Is.Zero);
+                InputSystem.QueueStateEvent(owned, new KeyboardState()); InputSystem.Update();
+                Assert.That(samples, Is.EqualTo(3)); Assert.That(held, Is.False); Assert.That(pressed, Is.False);
+                Assert.That(sampledShift, Is.False); Assert.That(sampledControl, Is.False); Assert.That(direction, Is.Zero);
             }
             finally
             {
-                if (owned != null && owned.added) InputSystem.RemoveDevice(owned);
+                if (readShortcut != null) InputSystem.onAfterUpdate -= readShortcut;
+                input.TearDown(); // Restores devices, settings, callbacks and input state, including on assertion failure.
                 if (previous != null && previous.added) previous.MakeCurrent();
             }
+            Assert.That(InputSystem.devices, Is.EqualTo(previousDevices)); Assert.That(InputSystem.settings, Is.SameAs(previousSettings));
+            Assert.That(Keyboard.current, Is.SameAs(previous));
+            if (previous != null) Assert.That(previous.allKeys.Where(item => item.isPressed).Select(item => item.keyCode).ToArray(), Is.EqualTo(previousKeys));
         }
     }
 }

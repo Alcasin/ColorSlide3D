@@ -37,7 +37,7 @@ try {
     Compile-Assembly 'ColorSlide.Runtime.PlayerCheck.dll' @(Get-ChildItem 'Assets/_ColorSlide/Runtime' -Recurse -Filter *.cs -File).FullName $base 'UNITY_ANDROID;UNITY_6000_3_OR_NEWER;ENABLE_INPUT_SYSTEM'
     Compile-Assembly 'ColorSlide.Runtime.dll' @(Get-ChildItem 'Assets/_ColorSlide/Runtime' -Recurse -Filter *.cs -File).FullName $base 'UNITY_EDITOR;UNITY_6000_3_OR_NEWER;ENABLE_INPUT_SYSTEM'
     Compile-Assembly 'ColorSlide.Editor.dll' @(Get-ChildItem 'Assets/_ColorSlide/Editor' -Recurse -Filter *.cs -File).FullName ($base + $editor.FullName + $runtime) 'UNITY_EDITOR;UNITY_6000_3_OR_NEWER;ENABLE_INPUT_SYSTEM'
-    $testRefs = $base + $editor.FullName + @($runtime,$editorAssembly,$nunit,(Join-Path $project 'Library/ScriptAssemblies/UnityEngine.TestRunner.dll'),(Join-Path $project 'Library/ScriptAssemblies/UnityEditor.TestRunner.dll'))
+    $testRefs = $base + $editor.FullName + @($runtime,$editorAssembly,$nunit,(Join-Path $project 'Library/ScriptAssemblies/Unity.InputSystem.TestFramework.dll'),(Join-Path $project 'Library/ScriptAssemblies/UnityEngine.TestRunner.dll'),(Join-Path $project 'Library/ScriptAssemblies/UnityEditor.TestRunner.dll'))
     Compile-Assembly 'ColorSlide.Tests.EditMode.dll' @(Get-ChildItem 'Assets/_ColorSlide/Tests/EditMode' -Recurse -Filter *.cs -File).FullName $testRefs 'UNITY_EDITOR;UNITY_INCLUDE_TESTS;UNITY_6000_3_OR_NEWER;ENABLE_INPUT_SYSTEM'
     Compile-Assembly 'M46Verification.exe' @((Join-Path $PSScriptRoot 'M46Verification.cs')) $testRefs 'UNITY_EDITOR' 'exe'
     $env:MONO_PATH = "$output;$UnityData/Managed;$UnityData/Managed/UnityEngine;" + (Join-Path $project 'Library/ScriptAssemblies') + ';' + (Split-Path $nunit)
